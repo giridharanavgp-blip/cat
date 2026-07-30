@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
+import TeachingVideoModal from "./TeachingVideoModal";
 
 export default function PatientPortalDashboard({ patientName = "Maya Patel", age = 10, diagnosis = "Articulation Deficit / Sigmatism", onSignOut }) {
+  const [activeVideo, setActiveVideo] = useState(null);
+
   const ASSIGNED_TARGETS = [
     {
       id: "b3",
@@ -9,6 +12,7 @@ export default function PatientPortalDashboard({ patientName = "Maya Patel", age
       description: "Practice producing the /s/ sound cleanly at the beginning and end of words (e.g., 'sun', 'bus').",
       progress: 75,
       status: "In Progress",
+      teaching_video_url: "https://res.cloudinary.com/demo/video/upload/v1/cat/s_sound_demo.mp4",
       notes: "Great improvement on initial position. Work on final /s/ sounds this week!"
     },
     {
@@ -18,6 +22,7 @@ export default function PatientPortalDashboard({ patientName = "Maya Patel", age
       description: "Maintain natural eye contact during conversational turns with family members.",
       progress: 90,
       status: "Achieved Target",
+      teaching_video_url: "https://res.cloudinary.com/demo/video/upload/v1/cat/eye_contact_demo.mp4",
       notes: "Maintained steady eye contact for 5 minutes during story time."
     },
     {
@@ -27,6 +32,7 @@ export default function PatientPortalDashboard({ patientName = "Maya Patel", age
       description: "Speak smoothly without repeating words or stopping mid-sentence.",
       progress: 60,
       status: "In Progress",
+      teaching_video_url: "https://res.cloudinary.com/demo/video/upload/v1/cat/fluency_demo.mp4",
       notes: "Practice gentle speech onset when starting new sentences."
     }
   ];
@@ -79,9 +85,9 @@ export default function PatientPortalDashboard({ patientName = "Maya Patel", age
           </div>
         </div>
 
-        {/* Assigned Home Practice Cards */}
+        {/* Assigned Home Practice Video Cards */}
         <div className="space-y-3">
-          <h2 className="text-lg font-bold text-white tracking-tight">Assigned Speech Targets & Practice Goals</h2>
+          <h2 className="text-lg font-bold text-white tracking-tight">Assigned Speech Targets & Guided Videos</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {ASSIGNED_TARGETS.map((target) => (
@@ -113,6 +119,13 @@ export default function PatientPortalDashboard({ patientName = "Maya Patel", age
                   <div className="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800 text-[11px] text-slate-300">
                     <span className="font-bold text-indigo-300">Clinician Note:</span> {target.notes}
                   </div>
+
+                  <button
+                    onClick={() => setActiveVideo(target)}
+                    className="w-full py-2 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition flex items-center justify-center gap-1.5 shadow-md shadow-emerald-900/30"
+                  >
+                    <span>▶ Watch Demonstration Video</span>
+                  </button>
                 </div>
               </div>
             ))}
@@ -124,12 +137,18 @@ export default function PatientPortalDashboard({ patientName = "Maya Patel", age
           <h3 className="font-bold text-white text-base">💡 Home Practice Instructions for Caregivers</h3>
           <ul className="text-xs text-slate-300 space-y-2 list-disc list-inside leading-relaxed">
             <li>Practice home speech exercises in brief 5-to-10 minute daily intervals.</li>
-            <li>Focus on clear articulation turns with {patientName} during routine daily activities.</li>
+            <li>Watch the instructional video together with {patientName} before starting practice turns.</li>
             <li>Offer immediate positive praise when target sounds are produced correctly.</li>
           </ul>
         </div>
       </main>
+
+      {activeVideo && (
+        <TeachingVideoModal
+          behavior={activeVideo}
+          onClose={() => setActiveVideo(null)}
+        />
+      )}
     </div>
   );
 }
-
