@@ -1,0 +1,37 @@
+# Table: behaviors
+id,title,category,description,teaching_video_url
+b1,Eye Contact During Conversation,Pragmatics,Client initiates and maintains appropriate eye contact during conversational turns.,https://res.cloudinary.com/demo/video/upload/v1/cat/eye_contact_demo.mp4
+b2,Turn-Taking in Dialogue,Pragmatics,Client waits for conversational partner to finish before responding.,https://res.cloudinary.com/demo/video/upload/v1/cat/turn_taking_demo.mp4
+b3,Correct Production of /s/ Sound,Articulation,Client produces /s/ phoneme correctly in initial medial and final word positions.,https://res.cloudinary.com/demo/video/upload/v1/cat/s_sound_demo.mp4
+b4,Fluent Speech Without Repetitions,Fluency,Client speaks without part-word or whole-word repetitions exceeding typical disfluency norms.,https://res.cloudinary.com/demo/video/upload/v1/cat/fluency_demo.mp4
+b5,Appropriate Vocal Pitch Variation,Voice,Client demonstrates natural pitch inflection appropriate to age and gender norms.,https://res.cloudinary.com/demo/video/upload/v1/cat/pitch_demo.mp4
+b6,Use of Appropriate Sentence Length,Language,Client produces sentences of age-appropriate mean length of utterance (MLU).,https://res.cloudinary.com/demo/video/upload/v1/cat/mlu_demo.mp4
+b7,Requesting Clarification,Pragmatics,Client appropriately requests clarification when a message is not understood.,https://res.cloudinary.com/demo/video/upload/v1/cat/clarification_demo.mp4
+b8,Appropriate Vocal Loudness,Voice,Client maintains vocal intensity appropriate to context without excessive strain.,https://res.cloudinary.com/demo/video/upload/v1/cat/loudness_demo.mp4
+
+# Table: clinicians
+id,email,full_name,created_at
+c101,dr.demo.slp@example.com,Dr. Demo SLP,2026-07-30T12:00:00Z
+
+# Table: patients
+id,clinician_id,name,age,primary_diagnosis,created_at
+p1,c101,Alex Johnson,7,Speech & Language Delay,2026-07-28T10:00:00Z
+p2,c101,Maya Patel,10,Articulation Deficit / Sigmatism,2026-07-25T14:30:00Z
+p3,c101,Sam Miller,5,Disfluency / Childhood Apraxia of Speech,2026-07-20T09:15:00Z
+
+# Table: assessment_sessions
+id,patient_id,clinician_id,session_date,created_at
+s1001,p1,c101,2026-07-30,2026-07-30T14:00:00Z
+
+# Table: assessment_scores
+id,session_id,behavior_id,status,notes,updated_at
+sc1,s1001,b1,Present,Maintained consistent eye contact during introductory dialogue.,2026-07-30T14:05:00Z
+sc2,s1001,b3,Absent,Demonstrated interdental lisp on initial /s/ words.,2026-07-30T14:10:00Z
+
+# Table: audio_analyses
+id,session_id,transcript,tempo_bpm,pitch_avg,words_per_minute,duration,created_at
+a1,s1001,"The sun shines bright in the summer sky.",115.4,210.5,130,12.5,2026-07-30T14:12:00Z
+
+# Table: clinical_reports
+id,session_id,report_markdown,created_at
+r1,s1001,"# Clinical Assessment Report Narrative...",2026-07-30T14:15:00Z
