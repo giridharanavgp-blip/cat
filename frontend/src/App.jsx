@@ -2,6 +2,9 @@ import React, { useEffect, useState, useMemo } from "react";
 import { supabase } from "./lib/supabaseClient";
 import AssessmentDashboard from "./components/AssessmentDashboard";
 
+import PatientPortalDashboard from "./components/PatientPortalDashboard";
+import AdminPortalDashboard from "./components/AdminPortalDashboard";
+
 const DEMO_PATIENTS = [
   {
     id: "demo-patient-1",
@@ -31,6 +34,7 @@ const DEMO_PATIENTS = [
 
 export default function App() {
   const [session, setSession] = useState(null);
+  const [userRole, setUserRole] = useState("clinician"); // clinician, patient, admin
   const [authEmail, setAuthEmail] = useState("");
   const [authPassword, setAuthPassword] = useState("");
   const [authMode, setAuthMode] = useState("sign-in");
@@ -93,17 +97,32 @@ export default function App() {
     }
   }
 
-  function handleDemoLogin() {
+  function handleDemoClinicianLogin() {
     setAuthError(null);
-    const demoSession = {
-      user: {
-        id: "demo-clinician-123",
-        email: "dr.demo.slp@example.com",
-      },
+    setUserRole("clinician");
+    setSession({
+      user: { id: "demo-clinician-123", email: "dr.demo.slp@example.com" },
       isDemo: true,
-    };
-    setSession(demoSession);
+    });
     setPatients(DEMO_PATIENTS);
+  }
+
+  function handleDemoPatientLogin() {
+    setAuthError(null);
+    setUserRole("patient");
+    setSession({
+      user: { id: "demo-patient-2", email: "maya.patel@example.com" },
+      isDemo: true,
+    });
+  }
+
+  function handleDemoAdminLogin() {
+    setAuthError(null);
+    setUserRole("admin");
+    setSession({
+      user: { id: "demo-admin-999", email: "admin.director@example.com" },
+      isDemo: true,
+    });
   }
 
   async function handleSignOut() {
@@ -111,9 +130,11 @@ export default function App() {
       await supabase.auth.signOut();
     } catch (_) {}
     setSession(null);
+    setUserRole("clinician");
     setSelectedPatient(null);
     setActiveSessionId(null);
   }
+
 
   useEffect(() => {
     if (!session) return;
@@ -320,24 +341,42 @@ export default function App() {
                 </button>
               </form>
 
-              <div className="relative my-5">
+              <div className="relative my-4">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-slate-800" />
                 </div>
                 <div className="relative flex justify-center text-xs">
-                  <span className="bg-slate-900 px-3 text-slate-500 font-medium">Fast Demo Access</span>
+                  <span className="bg-slate-900 px-3 text-slate-500 font-medium">Instant Demo Access Modes</span>
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={handleDemoLogin}
-                className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold rounded-lg py-2.5 text-sm transition shadow-lg shadow-emerald-900/30 flex items-center justify-center gap-2 border border-emerald-400/20"
-              >
-                <span>⚡ Instant Demo Login (Dr. Demo, SLP)</span>
-              </button>
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  onClick={handleDemoClinicianLogin}
+                  className="w-full bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-500 hover:to-sky-500 text-white font-semibold rounded-lg py-2 text-xs transition shadow-md shadow-indigo-900/30 flex items-center justify-center gap-2 border border-indigo-400/20"
+                >
+                  <span>⚡ Clinician Demo (Dr. Demo, SLP)</span>
+                </button>
 
-              <div className="mt-5 text-center">
+                <button
+                  type="button"
+                  onClick={handleDemoPatientLogin}
+                  className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold rounded-lg py-2 text-xs transition shadow-md shadow-emerald-900/30 flex items-center justify-center gap-2 border border-emerald-400/20"
+                >
+                  <span>👤 Patient Demo (Maya Patel, Age 10)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleDemoAdminLogin}
+                  className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold rounded-lg py-2 text-xs transition shadow-md shadow-purple-900/30 flex items-center justify-center gap-2 border border-purple-400/20"
+                >
+                  <span>👑 Clinic Director & Admin Demo</span>
+                </button>
+              </div>
+
+              <div className="mt-4 text-center">
                 <button
                   onClick={() => setAuthMode(authMode === "sign-up" ? "sign-in" : "sign-up")}
                   className="text-xs text-indigo-400 hover:text-indigo-300 transition"
@@ -353,6 +392,34 @@ export default function App() {
       </div>
     );
   }
+
+  // --------------------------------------------------------------
+  // Render: Patient / Caregiver Demo Portal
+  // --------------------------------------------------------------
+  if (userRole === "patient") {
+    return (
+      <PatientPortalDashboard
+        patientName="Maya Patel"
+        age={10}
+        diagnosis="Articulation Deficit / Sigmatism"
+        onSignOut={handleSignOut}
+      />
+    );
+  }
+
+  // --------------------------------------------------------------
+  // Render: Admin / Clinic Director Demo Portal
+  // --------------------------------------------------------------
+  if (userRole === "admin") {
+    return (
+      <AdminPortalDashboard
+        clinicName="Metro Speech & Language Clinic"
+        adminName="Dr. Admin, Director"
+        onSignOut={handleSignOut}
+      />
+    );
+  }
+
 
   // --------------------------------------------------------------
   // Render: Active assessment session
