@@ -224,7 +224,7 @@ create trigger on_auth_user_created
   for each row execute procedure public.handle_new_user();
 
 -- ============================================================
--- Seed data: standardized communication behaviors
+-- Seed data: standardized communication behaviors & demo patients
 -- ============================================================
 insert into behaviors (title, category, description, teaching_video_url) values
 ('Eye Contact During Conversation', 'Pragmatics', 'Client initiates and maintains appropriate eye contact during conversational turns.', 'https://res.cloudinary.com/demo/video/upload/v1/cat/eye_contact_demo.mp4'),
@@ -236,4 +236,20 @@ insert into behaviors (title, category, description, teaching_video_url) values
 ('Requesting Clarification', 'Pragmatics', 'Client appropriately requests clarification when a message is not understood.', 'https://res.cloudinary.com/demo/video/upload/v1/cat/clarification_demo.mp4'),
 ('Appropriate Vocal Loudness', 'Voice', 'Client maintains vocal intensity appropriate to context without excessive strain.', 'https://res.cloudinary.com/demo/video/upload/v1/cat/loudness_demo.mp4')
 on conflict do nothing;
+
+-- Demo Patient Seeding Function for Real-Time Supabase Setup
+do $$
+declare
+  demo_clinician_id uuid;
+begin
+  select id into demo_clinician_id from auth.users limit 1;
+  if demo_clinician_id is not null then
+    insert into patients (clinician_id, name, age, primary_diagnosis) values
+    (demo_clinician_id, 'Maya Patel', 10, 'Articulation Deficit / Sigmatism'),
+    (demo_clinician_id, 'Alex Johnson', 7, 'Speech & Language Delay'),
+    (demo_clinician_id, 'Sam Miller', 5, 'Disfluency / Childhood Apraxia of Speech')
+    on conflict do nothing;
+  end if;
+end $$;
+
 
