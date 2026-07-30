@@ -1,0 +1,28 @@
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+*.env
+
+# Python
+ai-engine/venv/
+ai-engine/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+ai-engine/generated_reports/
+
+# Node / Frontend / Gateway
+node_modules/
+frontend/node_modules/
+gateway/node_modules/
+frontend/dist/
+frontend/build/
+.npm/
+
+# IDE & System
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
