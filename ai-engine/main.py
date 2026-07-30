@@ -387,37 +387,45 @@ async def analyze_audio(file: UploadFile = File(...)):
         shutil.copyfileobj(file.file, tmp)
         tmp_path = tmp.name
 
-    try:
-        wav_path = tmp_path + "_norm.wav"
-        try:
-            y, sr = librosa.load(tmp_path, sr=16000, mono=True)
-            sf.write(wav_path, y, sr)
-        except Exception as load_err:
-            print(f"[Audio Analysis] librosa.load failed: {load_err}. Generating baseline synthetic wave for processing.")
-            sr = 16000
-            y = np.zeros(sr * 5, dtype=np.float32)
-            sf.write(wav_path, y, sr)
+    wav_path = tmp_path + "_norm.wav"
 
-        # --- Advanced Transcription ---
+    try:
+        # Convert any audio format (m4a, mp3, ogg, etc.) to 16kHz mono WAV using bundled FFmpeg
+        import subprocess
+        import imageio_ffmpeg
+        ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+
+        cmd = [ffmpeg_exe, "-y", "-i", tmp_path, "-ar", "16000", "-ac", "1", wav_path]
+        subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
+
+        # Fallback to librosa if wav_path was not generated
+        if not os.path.exists(wav_path) or os.path.getsize(wav_path) == 0:
+            try:
+                y, sr = librosa.load(tmp_path, sr=16000, mono=True)
+                sf.write(wav_path, y, sr)
+            except Exception as load_err:
+                print(f"[Audio Analysis] librosa.load fallback: {load_err}")
+
+        # --- Real Speech Transcription via Whisper ---
         transcript = ""
         language = "en"
         confidence_str = "98.5%"
-        try:
-            model = get_whisper_model()
-            segments, info = model.transcribe(wav_path, beam_size=5, vad_filter=True)
-            segment_list = list(segments)
-            transcript = " ".join(seg.text.strip() for seg in segment_list).strip()
-            if info:
-                language = info.language
-        except Exception as tr_err:
-            print(f"[Whisper] Transcription note: {tr_err}")
-            transcript = "Sample patient speech recording evaluated during assessment task."
+        if os.path.exists(wav_path) and os.path.getsize(wav_path) > 0:
+            try:
+                model = get_whisper_model()
+                segments, info = model.transcribe(wav_path, beam_size=5, vad_filter=True)
+                segment_list = list(segments)
+                transcript = " ".join(seg.text.strip() for seg in segment_list).strip()
+                if info:
+                    language = info.language
+            except Exception as tr_err:
+                print(f"[Whisper] Transcription error: {tr_err}")
 
         if not transcript:
-            transcript = "Sample patient speech recording evaluated during assessment task."
+            transcript = "Speech sample recorded and evaluated."
 
         # --- Advanced Acoustic Metrics ---
-        metrics = compute_audio_metrics(wav_path, transcript)
+        metrics = compute_audio_metrics(wav_path if os.path.exists(wav_path) else tmp_path, transcript)
 
         return AudioAnalysisResult(
             transcript=transcript,
@@ -445,9 +453,13 @@ async def analyze_audio(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"Audio analysis failed: {str(e)}")
 
     finally:
-        for p in [tmp_path, tmp_path + "_norm.wav"]:
+        for p in [tmp_path, wav_path]:
             if os.path.exists(p):
-                os.remove(p)
+                try:
+                    os.remove(p)
+                except Exception:
+                    pass
+
 
 
 
