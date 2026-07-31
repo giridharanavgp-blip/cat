@@ -453,15 +453,6 @@ Formal evaluation and acoustic metrics confirm mild-to-moderate intervention nee
                   <span className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${categoryStyle}`}>
                     {behavior.category}
                   </span>
-
-                  {behavior.teaching_video_url && (
-                    <button
-                      onClick={() => setActiveVideoBehavior(behavior)}
-                      className="text-xs font-medium px-2.5 py-1 rounded-lg bg-indigo-500/10 text-indigo-300 hover:bg-indigo-500/20 border border-indigo-500/20 transition flex items-center gap-1"
-                    >
-                      <span>▶ Demo Video</span>
-                    </button>
-                  )}
                 </div>
 
                 <h3 className="font-bold text-white text-base leading-snug">{behavior.title}</h3>
@@ -610,13 +601,6 @@ Formal evaluation and acoustic metrics confirm mild-to-moderate intervention nee
           />
         )}
       </div>
-
-      {activeVideoBehavior && (
-        <TeachingVideoModal
-          behavior={activeVideoBehavior}
-          onClose={() => setActiveVideoBehavior(null)}
-        />
-      )}
     </div>
   );
 }
