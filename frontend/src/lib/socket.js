@@ -8,4 +8,5 @@ export const socket = io(GATEWAY_URL, {
   transports: ["websocket", "polling"],
 });
 
-export const AI_ENGINE_URL = import.meta.env.VITE_AI_ENGINE_URL || "http://localhost:8000";
+export const AI_ENGINE_URL = import.meta.env.VITE_AI_ENGINE_URL || "https://cat-ai-engine.onrender.com";
+
