@@ -78,13 +78,23 @@ export default function ReportViewer({ reportMarkdown, patientName, sessionId })
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           components={{
-            h1: ({ node, ...props }) => <h1 className="text-2xl font-extrabold text-white pb-2 border-b border-slate-800" {...props} />,
-            h2: ({ node, ...props }) => <h2 className="text-lg font-bold text-indigo-300 mt-4 mb-2" {...props} />,
-            h3: ({ node, ...props }) => <h3 className="text-sm font-semibold text-slate-200 mt-3 mb-1" {...props} />,
-            p: ({ node, ...props }) => <p className="text-slate-300 text-sm leading-relaxed" {...props} />,
-            ul: ({ node, ...props }) => <ul className="list-disc list-inside space-y-1 text-slate-300 text-sm pl-2" {...props} />,
+            h1: ({ node, ...props }) => <h1 className="text-2xl font-extrabold text-white pb-2 border-b border-slate-800 mb-4" {...props} />,
+            h2: ({ node, ...props }) => <h2 className="text-lg font-bold text-indigo-300 mt-6 mb-3 border-b border-slate-800/80 pb-1" {...props} />,
+            h3: ({ node, ...props }) => <h3 className="text-sm font-semibold text-slate-200 mt-4 mb-2" {...props} />,
+            p: ({ node, ...props }) => <p className="text-slate-300 text-sm leading-relaxed mb-3" {...props} />,
+            ul: ({ node, ...props }) => <ul className="list-disc list-inside space-y-1 text-slate-300 text-sm pl-2 mb-3" {...props} />,
             li: ({ node, ...props }) => <li className="text-slate-300 text-sm" {...props} />,
             strong: ({ node, ...props }) => <strong className="font-bold text-white" {...props} />,
+            table: ({ node, ...props }) => (
+              <div className="overflow-x-auto my-4 rounded-xl border border-slate-800 bg-slate-950/80 shadow-lg">
+                <table className="w-full text-left border-collapse text-xs" {...props} />
+              </div>
+            ),
+            thead: ({ node, ...props }) => <thead className="bg-slate-900/90 text-indigo-300 font-semibold border-b border-slate-800 uppercase tracking-wider text-[11px]" {...props} />,
+            tbody: ({ node, ...props }) => <tbody className="divide-y divide-slate-800/60" {...props} />,
+            tr: ({ node, ...props }) => <tr className="hover:bg-slate-900/50 transition-colors" {...props} />,
+            th: ({ node, ...props }) => <th className="px-4 py-3 font-semibold text-indigo-200 border-r border-slate-800/60 last:border-r-0" {...props} />,
+            td: ({ node, ...props }) => <td className="px-4 py-3 text-slate-300 border-r border-slate-800/40 last:border-r-0 leading-relaxed" {...props} />,
           }}
         >
           {reportMarkdown}

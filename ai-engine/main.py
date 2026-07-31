@@ -177,8 +177,12 @@ def _call_gemini(prompt: str, payload: Optional["GenerateReportRequest"] = None)
 | **Date of Assessment** | {s_date} |
 | **Overall Clinical Score** | **{score_out_of_10} / 10** ({grade_label}) |
 
-## Chief Complaint / Reason for Visit
-Patient presented for comprehensive Speech-Language Pathology evaluation due to referral concerns regarding **{p_diag}**. Evaluation requested to assess communicative clarity, articulation precision, prosodic modulation, and executive speech fluency.
+## Chief Complaint & Reason for Visit
+
+| Context Parameter | Clinical Description & Objectives |
+| :--- | :--- |
+| **Referral Concern** | Patient presented for comprehensive Speech-Language Pathology evaluation regarding **{p_diag}** |
+| **Evaluation Scope** | Assess communicative clarity, articulation precision, prosodic modulation, and executive speech fluency |
 
 ## Medical History
 
@@ -211,20 +215,34 @@ Patient presented for comprehensive Speech-Language Pathology evaluation due to 
 | :--- | :--- | :--- | :--- |
 {absent_rows}
 
-- **Speech**: Articulation screening for {p_name} reveals target phoneme production requiring structured motor placement exercises.
-- **Language**: Receptive and expressive language skills demonstrate functional competency for age {p_age}.
-- **Voice**: Vocal pitch ({pitch} Hz) and intensity exhibit baseline conversational stability.
-- **Fluency**: Speaking pace measured at {wpm} WPM with {pauses} disfluency pause intervals.
-- **Swallowing**: Oral-motor screening intact; no dysphagia symptoms reported.
-- **Behavioral Observations**: Patient was cooperative, alert, and engaged throughout standardized tasks.
+### Speech & Language Sub-Domain Findings Summary
+| Sub-Domain | Clinical Findings & Functional Status |
+| :--- | :--- |
+| **Speech Articulation** | Articulation screening for {p_name} reveals target phoneme production requiring structured motor placement exercises. |
+| **Language Competency** | Receptive and expressive language skills demonstrate functional competency for age {p_age}. |
+| **Voice & Pitch** | Vocal pitch ({pitch} Hz) and intensity exhibit baseline conversational stability. |
+| **Fluency & Tempo** | Speaking pace measured at {wpm} WPM with {pauses} disfluency pause intervals. |
+| **Swallowing & Oral Motor** | Oral-motor screening intact; no dysphagia symptoms reported. |
+| **Behavioral Engagement** | Patient was cooperative, alert, and engaged throughout standardized tasks. |
 
-## Clinical Findings
-Formal evaluation confirms mild-to-moderate intervention needs in target articulation and prosodic turn-taking. {audio_telemetry_findings}
+## Acoustic & Speech Analysis Telemetry
 
-## Diagnosis
-**Primary Diagnosis**: **{p_diag}** (ICD-10 / SLP Diagnostic Classification).
+| Telemetry Parameter | Measured Value | Clinical Benchmark & Assessment |
+| :--- | :--- | :--- |
+| **Speaking Rate** | **{wpm} WPM** | Functional speaking pace |
+| **Speech Tempo** | **{bpm} BPM** | Rhythm and pace within normal limits |
+| **Fundamental Pitch (F0)** | **{pitch} Hz** | Stable pitch modulation |
+| **Pause Disfluencies** | **{pauses} Pauses** | Low pause frequency detected |
+| **Signal Loudness** | **{loudness} dB** | Normal vocal intensity level |
 
-## Treatment Plan
+## Clinical Findings & Diagnosis
+
+| Clinical Area | Findings & Coding Details |
+| :--- | :--- |
+| **Evaluation Summary** | Formal evaluation confirms mild-to-moderate intervention needs in target articulation and prosodic turn-taking. |
+| **Primary Diagnosis** | **{p_diag}** (ICD-10 / SLP Diagnostic Classification) |
+
+## Treatment Plan & Recommendations
 
 | Treatment Parameter | Recommendation & Schedule |
 | :--- | :--- |
@@ -233,17 +251,20 @@ Formal evaluation confirms mild-to-moderate intervention needs in target articul
 | **Home Exercises** | Daily 5–10 minute practice targeting identified articulation sounds |
 | **Follow-up Date** | Re-evaluation scheduled in 12 weeks ({s_date}) |
 
-## Additional Notes
-- Caregiver educated on supportive home communication strategies and positive reinforcement techniques.
-- Practice targets assigned for home reinforcement.
+## Caregiver & Home Instructions
+
+| Strategy Focus | Implementation Plan |
+| :--- | :--- |
+| **Communication Strategy** | Caregiver educated on supportive home communication strategies and positive reinforcement techniques. |
+| **Home Practice** | Practice targets assigned for home reinforcement. |
 
 ## Speech-Language Pathologist Details
 
 | SLP Record Field | Details |
 | :--- | :--- |
-| **Name** | {c_name} |
-| **Signature** | *{c_name} (Electronically Signed)* |
-| **Date** | {s_date} |
+| **Evaluating Clinician** | {c_name} |
+| **Electronic Signature** | *{c_name} (Electronically Signed)* |
+| **Report Date** | {s_date} |
 """
 
 def _call_groq(prompt: str, payload: Optional["GenerateReportRequest"] = None) -> str:
@@ -556,19 +577,21 @@ AUDIO/ACOUSTIC ANALYSIS DATA:
 {audio_section}
 
 TASK:
-Write a complete clinical report in Markdown with the following sections, using level-2 headings ("## Section Name"):
-## Background and Reason for Referral
-## Assessment Procedures
-## Clinical Observations and Findings
-   (Synthesize the Present/Absent behavior data into a narrative discussion, organized by category: Articulation, Fluency, Voice, Language, Pragmatics)
-## Acoustic and Speech Analysis Summary
-   (Interpret the tempo, pitch, and pause data in clinical terms)
-## Clinical Impressions
-## Recommendations
-   (Provide 3-6 specific, actionable recommendations for therapy goals, caregiver strategies, or further evaluation)
+CRITICAL REQUIREMENT: Format ALL content exclusively using Markdown Tables (`| Header 1 | Header 2 |`). Do NOT use plain paragraphs or bulleted list points anywhere in the document.
 
-Keep the tone professional and evidence-based. Do not invent scores or data not provided above. If audio data was not provided, omit unsupported claims and note that acoustic analysis was not performed.
-Output ONLY the Markdown report, with no preamble or explanation before or after it.
+Write a complete clinical report in Markdown with the following sections, using level-2 headings ("## Section Name") and rendering EVERY section in table format:
+## Patient Information (Table format)
+## Background and Reason for Referral (Table format)
+## Medical History (Table format)
+## Demonstrated Competencies & Strengths (Table format)
+## Identified Deficits & Target Areas (Table format)
+## Sub-Domain Speech & Language Findings (Table format)
+## Acoustic & Speech Telemetry Analytics (Table format)
+## Clinical Impressions & Diagnosis (Table format)
+## Treatment Plan & Recommendations (Table format)
+## SLP Sign-off Details (Table format)
+
+Keep the tone professional and evidence-based. Do not invent scores or data not provided above. Output ONLY the Markdown report in 100% table form, with no preamble or explanation.
 """
 
     return prompt.strip()

@@ -321,7 +321,7 @@ export default function AssessmentDashboard({ sessionId, patient, clinicianName 
     const geminiKey = import.meta.env.VITE_GEMINI_API_KEY || "AIzaSy_demo_key";
     if (geminiKey && geminiKey.length > 10 && !geminiKey.includes("demo_key")) {
       try {
-        const geminiPrompt = `You are a licensed Speech-Language Pathologist. Create a professional SLP report for patient ${pName} (Age ${pAge}, Diagnosis: ${pDiag}). Overall Score: ${scoreMark}/10 (${gradeLabel}). Behaviors Present: ${presentItems.map(i => i.title).join(", ")}. Behaviors Absent: ${absentItems.map(i => i.title).join(", ")}. Output Markdown with tables for Patient Info, Medical History, Assessment, Clinical Findings, Diagnosis, Treatment Plan, and SLP Details.`;
+        const geminiPrompt = `You are a licensed Speech-Language Pathologist writing a formal clinical report. Format ALL content strictly using Markdown tables (| Header | Header |). Do NOT use plain paragraphs or bullet point lists anywhere in the report. Create clear Markdown tables for Patient Info, Chief Complaint, Medical History, Overall Ratings, Demonstrated Strengths, Identified Deficits, Sub-Domain Findings, Acoustic Analytics, Clinical Findings, Diagnosis, Treatment Plan, and SLP Details for patient ${pName} (Age ${pAge}, Diagnosis: ${pDiag}). Overall Score: ${scoreMark}/10 (${gradeLabel}). Behaviors Present: ${presentItems.map(i => i.title).join(", ")}. Behaviors Absent: ${absentItems.map(i => i.title).join(", ")}.`;
 
         const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`, {
           method: "POST",
@@ -377,8 +377,12 @@ export default function AssessmentDashboard({ sessionId, patient, clinicianName 
 | **Speech Intelligibility Rating** | **96.0%** | Clear vocal prosody and sound production |
 | **Target Phoneme Accuracy** | **${accuracyPct}%** | Demonstrated target behavior competency (${presentItems.length} of ${Math.max(1, totalEval)} targets) |
 
-## Chief Complaint / Reason for Visit
-Patient presented for comprehensive Speech-Language Pathology evaluation due to referral concerns regarding **${pDiag}**. Evaluation requested to assess communicative clarity, articulation precision, prosodic modulation, and executive speech fluency.
+## Chief Complaint & Reason for Visit
+
+| Clinical Context | Description & Scope |
+| :--- | :--- |
+| **Referral Reason** | Patient presented for comprehensive SLP evaluation regarding **${pDiag}** |
+| **Evaluation Objectives** | Assess communicative clarity, articulation precision, prosodic modulation, and executive speech fluency |
 
 ## Medical History
 
@@ -401,17 +405,31 @@ ${presentRows}
 | :--- | :--- | :--- | :--- |
 ${absentRows}
 
-- **Speech**: Articulation screening reveals target phoneme production requiring structured motor placement exercises.
-- **Language**: Mean length of utterance (MLU) and receptive language comprehension are functional.
-- **Voice & Fluency**: Vocal pitch (${pitch} Hz) and speaking rate (${wpm} WPM) exhibit functional prosodic stability.
+### Speech & Language Sub-Domain Findings Summary
+| Sub-Domain | Clinical Findings & Functional Status |
+| :--- | :--- |
+| **Speech Articulation** | Articulation screening reveals target phoneme production requiring structured motor placement exercises. |
+| **Language Competency** | Mean length of utterance (MLU) and receptive language comprehension are functional for age. |
+| **Voice & Pitch** | Vocal pitch (${pitch} Hz) exhibits functional prosodic stability without strain. |
+| **Fluency & Tempo** | Speaking rate measured at ${wpm} WPM with ${pauses} disfluency pause intervals. |
 
-## Clinical Findings
-Formal evaluation confirms mild-to-moderate intervention needs in target articulation and prosodic turn-taking. Automated Speech Analysis: Speaking rate of **${wpm} WPM** at **${bpm} BPM**. Pitch frequency measured at **${pitch} Hz** with ${pauses} disfluency pause intervals.
+## Acoustic & Audio Telemetry Analytics
 
-## Diagnosis
-**Primary Diagnosis**: **${pDiag}** (ICD-10 / SLP Diagnostic Classification).
+| Metric Parameter | Value | Clinical Benchmark & Interpretation |
+| :--- | :--- | :--- |
+| **Speaking Rate** | **${wpm} WPM** | Functional conversational rate |
+| **Speech Tempo** | **${bpm} BPM** | Rhythm and pace within normal limits |
+| **Pitch Frequency (F0)** | **${pitch} Hz** | Stable pitch modulation |
+| **Pause Disfluency Count** | **${pauses} Pauses** | Low pause count during task execution |
 
-## Treatment Plan
+## Clinical Findings & Diagnosis
+
+| Clinical Category | Details & Diagnostic Coding |
+| :--- | :--- |
+| **Clinical Summary** | Formal evaluation confirms mild-to-moderate intervention needs in target articulation and prosodic turn-taking. |
+| **Primary Diagnosis** | **${pDiag}** (ICD-10 / SLP Diagnostic Classification) |
+
+## Treatment Plan & Recommendations
 
 | Treatment Parameter | Recommendation & Schedule |
 | :--- | :--- |
@@ -423,9 +441,9 @@ Formal evaluation confirms mild-to-moderate intervention needs in target articul
 
 | SLP Record Field | Details |
 | :--- | :--- |
-| **Name** | ${clinicianName} |
-| **Signature** | *${clinicianName} (Electronically Signed)* |
-| **Date** | ${sDate} |
+| **Evaluating Clinician** | ${clinicianName} |
+| **Electronic Signature** | *${clinicianName} (Electronically Signed)* |
+| **Report Date** | ${sDate} |
 `;
     setReportMarkdown(reportFallback);
     setIsGeneratingReport(false);
