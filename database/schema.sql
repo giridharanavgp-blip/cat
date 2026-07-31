@@ -224,18 +224,17 @@ create trigger on_auth_user_created
   for each row execute procedure public.handle_new_user();
 
 -- ============================================================
--- Seed data: standardized communication behaviors & demo patients
+-- Seed data: standardized communication behaviors
 -- ============================================================
-insert into behaviors (title, category, description, teaching_video_url) values
-('Eye Contact During Conversation', 'Pragmatics', 'Client initiates and maintains appropriate eye contact during conversational turns.', 'https://res.cloudinary.com/demo/video/upload/v1/cat/eye_contact_demo.mp4'),
-('Turn-Taking in Dialogue', 'Pragmatics', 'Client waits for conversational partner to finish before responding.', 'https://res.cloudinary.com/demo/video/upload/v1/cat/turn_taking_demo.mp4'),
-('Correct Production of /s/ Sound', 'Articulation', 'Client produces /s/ phoneme correctly in initial, medial, and final word positions.', 'https://res.cloudinary.com/demo/video/upload/v1/cat/s_sound_demo.mp4'),
-('Fluent Speech Without Repetitions', 'Fluency', 'Client speaks without part-word or whole-word repetitions exceeding typical disfluency norms.', 'https://res.cloudinary.com/demo/video/upload/v1/cat/fluency_demo.mp4'),
-('Appropriate Vocal Pitch Variation', 'Voice', 'Client demonstrates natural pitch inflection appropriate to age and gender norms.', 'https://res.cloudinary.com/demo/video/upload/v1/cat/pitch_demo.mp4'),
-('Use of Appropriate Sentence Length', 'Language', 'Client produces sentences of age-appropriate mean length of utterance (MLU).', 'https://res.cloudinary.com/demo/video/upload/v1/cat/mlu_demo.mp4'),
-('Requesting Clarification', 'Pragmatics', 'Client appropriately requests clarification when a message is not understood.', 'https://res.cloudinary.com/demo/video/upload/v1/cat/clarification_demo.mp4'),
-('Appropriate Vocal Loudness', 'Voice', 'Client maintains vocal intensity appropriate to context without excessive strain.', 'https://res.cloudinary.com/demo/video/upload/v1/cat/loudness_demo.mp4')
-on conflict do nothing;
+INSERT INTO behaviors (title, category, description) VALUES ('Eye Contact During Conversation', 'Pragmatics', 'Client initiates and maintains appropriate eye contact during conversational turns.');
+INSERT INTO behaviors (title, category, description) VALUES ('Turn-Taking in Dialogue', 'Pragmatics', 'Client waits for conversational partner to finish before responding.');
+INSERT INTO behaviors (title, category, description) VALUES ('Correct Production of /s/ Sound', 'Articulation', 'Client produces /s/ phoneme correctly in initial, medial, and final word positions.');
+INSERT INTO behaviors (title, category, description) VALUES ('Fluent Speech Without Repetitions', 'Fluency', 'Client speaks without part-word or whole-word repetitions exceeding typical disfluency norms.');
+INSERT INTO behaviors (title, category, description) VALUES ('Appropriate Vocal Pitch Variation', 'Voice', 'Client demonstrates natural pitch inflection appropriate to age and gender norms.');
+INSERT INTO behaviors (title, category, description) VALUES ('Use of Appropriate Sentence Length', 'Language', 'Client produces sentences of age-appropriate mean length of utterance (MLU).');
+INSERT INTO behaviors (title, category, description) VALUES ('Requesting Clarification', 'Pragmatics', 'Client appropriately requests clarification when a message is not understood.');
+INSERT INTO behaviors (title, category, description) VALUES ('Appropriate Vocal Loudness', 'Voice', 'Client maintains vocal intensity appropriate to context without excessive strain.');
+
 
 -- Demo Patient Seeding Function for Real-Time Supabase Setup
 do $$
