@@ -142,18 +142,18 @@ export default function App() {
   }, [session]);
 
   async function loadPatients() {
+    setPatients((prev) => (prev.length > 0 ? prev : DEMO_PATIENTS));
     try {
-      const { data, error } = await supabase
-        .from("patients")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (!error && data && data.length > 0) {
-        setPatients(data);
-        return;
+      const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 1000));
+      const fetchPromise = supabase.from("patients").select("*").order("created_at", { ascending: false });
+
+      const res = await Promise.race([fetchPromise, timeoutPromise]);
+      if (res?.data && res.data.length > 0) {
+        setPatients(res.data);
       }
     } catch (_) {}
-    setPatients((prev) => (prev.length > 0 ? prev : DEMO_PATIENTS));
   }
+
 
   async function handleCreatePatient(e) {
     e.preventDefault();
