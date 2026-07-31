@@ -449,21 +449,31 @@ ${absentRows}
     setIsGeneratingReport(false);
   }
 
-  const categories = useMemo(() => {
-    const cats = new Set(behaviors.map((b) => b.category));
-    return ["all", ...Array.from(cats)];
+  const uniqueBehaviors = useMemo(() => {
+    const seen = new Set();
+    return behaviors.filter((b) => {
+      const key = (b.title || b.id || "").toLowerCase().trim();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
   }, [behaviors]);
 
+  const categories = useMemo(() => {
+    const cats = new Set(uniqueBehaviors.map((b) => b.category));
+    return ["all", ...Array.from(cats)];
+  }, [uniqueBehaviors]);
+
   const filteredBehaviors = useMemo(() => {
-    if (activeCategory === "all") return behaviors;
-    return behaviors.filter((b) => b.category === activeCategory);
-  }, [behaviors, activeCategory]);
+    if (activeCategory === "all") return uniqueBehaviors;
+    return uniqueBehaviors.filter((b) => b.category === activeCategory);
+  }, [uniqueBehaviors, activeCategory]);
 
   const progressSummary = useMemo(() => {
-    const total = behaviors.length;
-    const scored = behaviors.filter((b) => scores[b.id]?.status && scores[b.id]?.status !== "Not Observed").length;
+    const total = uniqueBehaviors.length;
+    const scored = uniqueBehaviors.filter((b) => scores[b.id]?.status && scores[b.id]?.status !== "Not Observed").length;
     return { total, scored, percentage: total ? Math.round((scored / total) * 100) : 0 };
-  }, [behaviors, scores]);
+  }, [uniqueBehaviors, scores]);
 
   return (
     <div className="space-y-6">
@@ -502,7 +512,7 @@ ${absentRows}
           </div>
           <div className="w-full bg-slate-900 rounded-full h-2.5 overflow-hidden p-0.5 border border-slate-800">
             <div
-              className="bg-gradient-to-r from-indigo-500 via-sky-400 to-emerald-400 h-1.5 rounded-full transition-all duration-500 shadow-sm shadow-indigo-500/50"
+              className="bg-gradient-to-r from-indigo-500 via-sky-400 to-emerald-400 h-1.5 rounded-full transition-all duration-500 shadow-sm shadow-indigo-500/50 animate-shimmer"
               style={{ width: `${progressSummary.percentage}%` }}
             />
           </div>
@@ -526,7 +536,7 @@ ${absentRows}
             onClick={() => setActiveCategory(cat)}
             className={`text-xs font-semibold px-4 py-2 rounded-xl transition border whitespace-nowrap ${
               activeCategory === cat
-                ? "bg-indigo-600 text-white border-indigo-500 shadow-md shadow-indigo-600/20"
+                ? "bg-indigo-600 text-white border-indigo-500 shadow-md shadow-indigo-600/20 scale-105"
                 : "bg-slate-900/60 text-slate-400 border-slate-800 hover:text-slate-200 hover:border-slate-700"
             }`}
           >
@@ -537,14 +547,15 @@ ${absentRows}
 
       {/* Behavior Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {filteredBehaviors.map((behavior) => {
+        {filteredBehaviors.map((behavior, idx) => {
           const entry = scores[behavior.id] || {};
           const categoryStyle = CATEGORY_COLORS[behavior.category] || "bg-slate-800 text-slate-300 border-slate-700";
 
           return (
             <div
               key={behavior.id}
-              className="glass-panel rounded-2xl p-5 flex flex-col justify-between space-y-4 glass-card-hover"
+              className="glass-panel rounded-2xl p-5 flex flex-col justify-between space-y-4 glass-card-hover animate-fade-in-up"
+              style={{ animationDelay: `${idx * 0.05}s` }}
             >
               <div className="space-y-2">
                 <div className="flex items-start justify-between gap-2">
@@ -564,13 +575,20 @@ ${absentRows}
                 <div className="grid grid-cols-3 gap-2">
                   {STATUS_OPTIONS.map((status) => {
                     const isSelected = entry.status === status;
+                    let activeClass = "";
+                    if (isSelected) {
+                      if (status === "Present") activeClass = "status-btn-present-active";
+                      else if (status === "Absent") activeClass = "status-btn-absent-active";
+                      else activeClass = "status-btn-not-obs-active";
+                    }
+
                     return (
                       <button
                         key={status}
                         onClick={() => handleStatusChange(behavior.id, status)}
-                        className={`text-xs font-semibold py-2 rounded-lg border transition ${
+                        className={`text-xs font-semibold py-2 rounded-lg border transition-all duration-200 ${
                           isSelected
-                            ? STATUS_STYLES[status]
+                            ? activeClass
                             : "bg-slate-900/60 text-slate-400 border-slate-800 hover:border-slate-700 hover:text-slate-300"
                         }`}
                       >
