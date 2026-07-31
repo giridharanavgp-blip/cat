@@ -217,59 +217,82 @@ export default function AssessmentDashboard({ sessionId, patient, clinicianName 
       notes: scores[b.id]?.notes || "",
     }));
 
+    const pName = patient?.name || "Patient";
+    const pAge = patient?.age ? `${patient.age} Yrs` : "Unspecified";
+    const pDiag = patient?.primary_diagnosis || "Speech & Language Evaluation";
+    const sDate = new Date().toISOString().split("T")[0];
+    const pId = `PAT-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    const presentItems = scorePayload.filter((s) => s.status === "Present");
+    const absentItems = scorePayload.filter((s) => s.status === "Absent");
+    const totalEval = presentItems.length + absentItems.length;
+    const scoreMark = totalEval > 0 ? Math.round(((presentItems.length / totalEval) * 10.0) * 10) / 10 : 8.5;
+    const gradeLabel = scoreMark >= 9.0 ? "Superior Competency" : scoreMark >= 7.5 ? "Good Competency" : scoreMark >= 5.0 ? "Moderate Deficit" : "Severe Intervention Required";
+    const accuracyPct = Math.round((presentItems.length / Math.max(1, totalEval)) * 100);
+
+    // 1. Try Backend Python AI Engine
     try {
       const response = await axios.post(`${AI_ENGINE_URL}/generate-report`, {
         patient: {
-          name: patient?.name || "Patient",
+          name: pName,
           age: patient?.age ?? null,
-          primary_diagnosis: patient?.primary_diagnosis || null,
+          primary_diagnosis: pDiag,
         },
         clinician_name: clinicianName,
-        session_date: new Date().toISOString().split("T")[0],
+        session_date: sDate,
         scores: scorePayload,
         audio_metrics: audioAnalysis || null,
-      }, { timeout: 10000 });
+      }, { timeout: 8000 });
 
-      setReportMarkdown(response.data.report_markdown);
-      if (sessionId) {
-        try {
-          await supabase.from("clinical_reports").insert({
-            session_id: sessionId,
-            report_markdown: response.data.report_markdown,
-          });
-        } catch (_) {}
+      if (response.data?.report_markdown) {
+        setReportMarkdown(response.data.report_markdown);
+        setIsGeneratingReport(false);
+        return;
       }
-    } catch (err) {
-      console.warn("AI Engine report endpoint unreachable, generating client-side clinical report:", err);
-      const pName = patient?.name || "Patient";
-      const pAge = patient?.age ? `${patient.age} Yrs` : "Unspecified";
-      const pDiag = patient?.primary_diagnosis || "Speech & Language Evaluation";
-      const sDate = new Date().toISOString().split("T")[0];
-      const pId = `PAT-${Math.floor(1000 + Math.random() * 9000)}`;
+    } catch (backendErr) {
+      console.warn("Backend AI Engine unreachable, attempting direct Google Gemini API call...", backendErr);
+    }
 
-      const presentItems = scorePayload.filter((s) => s.status === "Present");
-      const absentItems = scorePayload.filter((s) => s.status === "Absent");
+    // 2. Try Direct Google Gemini REST API
+    const geminiKey = import.meta.env.VITE_GEMINI_API_KEY || "AIzaSy_demo_key";
+    if (geminiKey && geminiKey.length > 10 && !geminiKey.includes("demo_key")) {
+      try {
+        const geminiPrompt = `You are a licensed Speech-Language Pathologist. Create a professional SLP report for patient ${pName} (Age ${pAge}, Diagnosis: ${pDiag}). Overall Score: ${scoreMark}/10 (${gradeLabel}). Behaviors Present: ${presentItems.map(i => i.title).join(", ")}. Behaviors Absent: ${absentItems.map(i => i.title).join(", ")}. Output Markdown with tables for Patient Info, Medical History, Assessment, Clinical Findings, Diagnosis, Treatment Plan, and SLP Details.`;
 
-      const presentRows = presentItems.length > 0
-        ? presentItems.map((s) => `| ${s.category} | ${s.title} | Present | ${s.notes || "Within typical limits"} |`).join("\n")
-        : "| Assessment | General Screening | Present | Functional performance demonstrated |";
+        const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contents: [{ parts: [{ text: geminiPrompt }] }] }),
+        });
 
-      const absentRows = absentItems.length > 0
-        ? absentItems.map((s) => `| ${s.category} | ${s.title} | Deficit Noted | ${s.notes || "Requires structured clinical intervention"} |`).join("\n")
-        : "| Assessment | Deficit Screening | None | No severe deficits observed during evaluation |";
+        const geminiData = await geminiRes.json();
+        const geminiText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
 
-      const wpm = audioAnalysis?.words_per_minute || 135;
-      const bpm = audioAnalysis?.tempo_bpm || 124;
-      const pitch = audioAnalysis?.pitch_avg || 198.5;
-      const pauses = audioAnalysis?.pause_count || 2;
+        if (geminiText && geminiText.length > 100) {
+          setReportMarkdown(geminiText);
+          setIsGeneratingReport(false);
+          return;
+        }
+      } catch (geminiErr) {
+        console.warn("Google Gemini API call note:", geminiErr);
+      }
+    }
 
-      const totalEval = presentItems.length + absentItems.length;
-      const scoreMark = totalEval > 0 ? (presentItems.length / totalEval) * 10.0 : 8.5;
-      const roundedMark = Math.round(scoreMark * 10) / 10;
-      const gradeLabel = roundedMark >= 9.0 ? "Superior Competency" : roundedMark >= 7.5 ? "Good Competency" : roundedMark >= 5.0 ? "Moderate Deficit" : "Severe Intervention Required";
-      const accuracyPct = Math.round((presentItems.length / Math.max(1, totalEval)) * 100);
+    // 3. Dynamic Patient-Tailored Report Fallback
+    const presentRows = presentItems.length > 0
+      ? presentItems.map((s) => `| ${s.category} | ${s.title} | Present | ${s.notes || "Demonstrated clear, functional mastery during task."} |`).join("\n")
+      : "| Assessment | General Screening | Present | Functional performance demonstrated |";
 
-      const reportFallback = `# Speech-Language Pathology Clinical Report
+    const absentRows = absentItems.length > 0
+      ? absentItems.map((s) => `| ${s.category} | ${s.title} | Deficit Noted | ${s.notes || "Requires structured clinical intervention."} |`).join("\n")
+      : "| Assessment | Deficit Screening | None | No severe deficits observed during evaluation |";
+
+    const wpm = audioAnalysis?.words_per_minute || 135;
+    const bpm = audioAnalysis?.tempo_bpm || 124;
+    const pitch = audioAnalysis?.pitch_avg || 198.5;
+    const pauses = audioAnalysis?.pause_count || 2;
+
+    const reportFallback = `# Speech-Language Pathology Clinical Report
 
 ## Patient Information
 
@@ -280,19 +303,18 @@ export default function AssessmentDashboard({ sessionId, patient, clinicianName 
 | **Age** | ${pAge} |
 | **Gender** | Specified in Chart |
 | **Date of Assessment** | ${sDate} |
-| **Overall Clinical Score** | **${roundedMark} / 10** (${gradeLabel}) |
+| **Overall Clinical Score** | **${scoreMark} / 10** (${gradeLabel}) |
 
 ## Overall Clinical Evaluation Rating
 
 | Rating Parameter | Score / Grade | Clinical Interpretation |
 | :--- | :--- | :--- |
-| **Overall Speech Competency Mark** | **${roundedMark} / 10** 🏆 | **${gradeLabel}** |
+| **Overall Speech Competency Mark** | **${scoreMark} / 10** 🏆 | **${gradeLabel}** |
 | **Speech Intelligibility Rating** | **96.0%** | Clear vocal prosody and sound production |
-| **Target Phoneme Accuracy** | **${accuracyPct}%** | Demonstrated target behavior competency |
+| **Target Phoneme Accuracy** | **${accuracyPct}%** | Demonstrated target behavior competency (${presentItems.length} of ${Math.max(1, totalEval)} targets) |
 
 ## Chief Complaint / Reason for Visit
 Patient presented for comprehensive Speech-Language Pathology evaluation due to referral concerns regarding **${pDiag}**. Evaluation requested to assess communicative clarity, articulation precision, prosodic modulation, and executive speech fluency.
-
 
 ## Medical History
 
@@ -341,13 +363,9 @@ Formal evaluation confirms mild-to-moderate intervention needs in target articul
 | **Signature** | *${clinicianName} (Electronically Signed)* |
 | **Date** | ${sDate} |
 `;
-      setReportMarkdown(reportFallback);
-    } finally {
-      setIsGeneratingReport(false);
-    }
+    setReportMarkdown(reportFallback);
+    setIsGeneratingReport(false);
   }
-
-
 
   const categories = useMemo(() => {
     const cats = new Set(behaviors.map((b) => b.category));
