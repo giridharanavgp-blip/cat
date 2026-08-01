@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import TeachingVideoModal from "./TeachingVideoModal";
 import { BehaviorDonutChart, DomainBarChart, AudioAcousticGraph, WeeklyPracticeBarChart } from "./ClinicalCharts";
+import SpeechTrainingBot from "./SpeechTrainingBot";
+import LiveCameraEyeTracker from "./LiveCameraEyeTracker";
 
 export default function PatientPortalDashboard({ patientName = "Maya Patel", age = 10, diagnosis = "Articulation Deficit / Sigmatism", onSignOut }) {
   const [activeVideo, setActiveVideo] = useState(null);
@@ -13,7 +15,7 @@ export default function PatientPortalDashboard({ patientName = "Maya Patel", age
       description: "Practice producing the /s/ sound cleanly at the beginning and end of words (e.g., 'sun', 'bus').",
       progress: 75,
       status: "In Progress",
-      teaching_video_url: "https://www.youtube.com/watch?v=Kk_t9L-y74k",
+      teaching_video_url: "https://www.youtube.com/watch?v=5m-C5mwpmxU",
       notes: "Great improvement on initial position. Work on final /s/ sounds this week!"
     },
     {
@@ -23,7 +25,7 @@ export default function PatientPortalDashboard({ patientName = "Maya Patel", age
       description: "Maintain natural eye contact during conversational turns with family members.",
       progress: 90,
       status: "Achieved Target",
-      teaching_video_url: "https://www.youtube.com/watch?v=O9tE25YV-rE",
+      teaching_video_url: "https://www.youtube.com/watch?v=HAnw168huqA",
       notes: "Maintained steady eye contact for 5 minutes during story time."
     },
     {
@@ -33,7 +35,7 @@ export default function PatientPortalDashboard({ patientName = "Maya Patel", age
       description: "Speak smoothly without repeating words or stopping mid-sentence.",
       progress: 60,
       status: "In Progress",
-      teaching_video_url: "https://www.youtube.com/watch?v=gzb-uFv5z8g",
+      teaching_video_url: "https://www.youtube.com/watch?v=d0sxFODi7-0",
       notes: "Practice gentle speech onset when starting new sentences."
     }
   ];
@@ -146,6 +148,9 @@ export default function PatientPortalDashboard({ patientName = "Maya Patel", age
           </div>
         </div>
 
+        {/* Live Webcam & Eye Contact Assessment */}
+        <LiveCameraEyeTracker />
+
         {/* Clinical History & Practice Guidance */}
         <div className="glass-panel rounded-2xl p-6 space-y-4">
           <h3 className="font-bold text-white text-base">💡 Home Practice Instructions for Caregivers</h3>
@@ -156,6 +161,9 @@ export default function PatientPortalDashboard({ patientName = "Maya Patel", age
           </ul>
         </div>
       </main>
+
+      {/* Floating Interactive Speech Bot Assistant */}
+      <SpeechTrainingBot />
 
       {activeVideo && (
         <TeachingVideoModal

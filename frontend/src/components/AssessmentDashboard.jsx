@@ -5,6 +5,8 @@ import { supabase } from "../lib/supabaseClient";
 import TeachingVideoModal from "./TeachingVideoModal";
 import ReportViewer from "./ReportViewer";
 import { BehaviorDonutChart, DomainBarChart, AudioAcousticGraph } from "./ClinicalCharts";
+import LiveCameraEyeTracker from "./LiveCameraEyeTracker";
+import SpeechTrainingBot from "./SpeechTrainingBot";
 
 const STATUS_OPTIONS = ["Present", "Absent", "Not Observed"];
 
@@ -23,14 +25,14 @@ const CATEGORY_COLORS = {
 };
 
 const DEFAULT_BEHAVIORS = [
-  { id: "b1", title: "Eye Contact During Conversation", category: "Pragmatics", description: "Client initiates and maintains appropriate eye contact during conversational turns.", teaching_video_url: "https://www.youtube.com/watch?v=O9tE25YV-rE" },
-  { id: "b2", title: "Turn-Taking in Dialogue", category: "Pragmatics", description: "Client waits for conversational partner to finish before responding.", teaching_video_url: "https://www.youtube.com/watch?v=O9tE25YV-rE" },
-  { id: "b3", title: "Correct Production of /s/ Sound", category: "Articulation", description: "Client produces /s/ phoneme correctly in initial, medial, and final word positions.", teaching_video_url: "https://www.youtube.com/watch?v=Kk_t9L-y74k" },
-  { id: "b4", title: "Fluent Speech Without Repetitions", category: "Fluency", description: "Client speaks without part-word or whole-word repetitions exceeding typical disfluency norms.", teaching_video_url: "https://www.youtube.com/watch?v=gzb-uFv5z8g" },
-  { id: "b5", title: "Appropriate Vocal Pitch Variation", category: "Voice", description: "Client demonstrates natural pitch inflection appropriate to age and gender norms.", teaching_video_url: "https://www.youtube.com/watch?v=Kk_t9L-y74k" },
-  { id: "b6", title: "Use of Appropriate Sentence Length", category: "Language", description: "Client produces sentences of age-appropriate mean length of utterance (MLU).", teaching_video_url: "https://www.youtube.com/watch?v=Kk_t9L-y74k" },
-  { id: "b7", title: "Requesting Clarification", category: "Pragmatics", description: "Client appropriately requests clarification when a message is not understood.", teaching_video_url: "https://www.youtube.com/watch?v=O9tE25YV-rE" },
-  { id: "b8", title: "Appropriate Vocal Loudness", category: "Voice", description: "Client maintains vocal intensity appropriate to context without excessive strain.", teaching_video_url: "https://www.youtube.com/watch?v=Kk_t9L-y74k" }
+  { id: "b1", title: "Eye Contact During Conversation", category: "Pragmatics", description: "Client initiates and maintains appropriate eye contact during conversational turns.", teaching_video_url: "https://www.youtube.com/watch?v=HAnw168huqA" },
+  { id: "b2", title: "Turn-Taking in Dialogue", category: "Pragmatics", description: "Client waits for conversational partner to finish before responding.", teaching_video_url: "https://www.youtube.com/watch?v=HAnw168huqA" },
+  { id: "b3", title: "Correct Production of /s/ Sound", category: "Articulation", description: "Client produces /s/ phoneme correctly in initial, medial, and final word positions.", teaching_video_url: "https://www.youtube.com/watch?v=5m-C5mwpmxU" },
+  { id: "b4", title: "Fluent Speech Without Repetitions", category: "Fluency", description: "Client speaks without part-word or whole-word repetitions exceeding typical disfluency norms.", teaching_video_url: "https://www.youtube.com/watch?v=d0sxFODi7-0" },
+  { id: "b5", title: "Appropriate Vocal Pitch Variation", category: "Voice", description: "Client demonstrates natural pitch inflection appropriate to age and gender norms.", teaching_video_url: "https://www.youtube.com/watch?v=5m-C5mwpmxU" },
+  { id: "b6", title: "Use of Appropriate Sentence Length", category: "Language", description: "Client produces sentences of age-appropriate mean length of utterance (MLU).", teaching_video_url: "https://www.youtube.com/watch?v=5m-C5mwpmxU" },
+  { id: "b7", title: "Requesting Clarification", category: "Pragmatics", description: "Client appropriately requests clarification when a message is not understood.", teaching_video_url: "https://www.youtube.com/watch?v=HAnw168huqA" },
+  { id: "b8", title: "Appropriate Vocal Loudness", category: "Voice", description: "Client maintains vocal intensity appropriate to context without excessive strain.", teaching_video_url: "https://www.youtube.com/watch?v=5m-C5mwpmxU" }
 ];
 
 export default function AssessmentDashboard({ sessionId, patient, clinicianName }) {
@@ -520,11 +522,13 @@ ${absentRows}
         </div>
       </div>
 
-      {/* Interactive Clinical Evaluation Charts & Graphs */}
+      {/* Interactive Clinical Evaluation Charts, Graphs & Camera Tracking */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <BehaviorDonutChart scores={scores} totalBehaviors={uniqueBehaviors.length} />
         <DomainBarChart behaviors={uniqueBehaviors} scores={scores} />
       </div>
+
+      <LiveCameraEyeTracker />
 
       {errorMessage && (
         <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-sm flex items-center justify-between">
@@ -734,6 +738,8 @@ ${absentRows}
           />
         )}
       </div>
+
+      <SpeechTrainingBot />
 
       {activeVideoBehavior && (
         <TeachingVideoModal
