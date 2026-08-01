@@ -22,14 +22,14 @@ const CATEGORY_COLORS = {
 };
 
 const DEFAULT_BEHAVIORS = [
-  { id: "b1", title: "Eye Contact During Conversation", category: "Pragmatics", description: "Client initiates and maintains appropriate eye contact during conversational turns." },
-  { id: "b2", title: "Turn-Taking in Dialogue", category: "Pragmatics", description: "Client waits for conversational partner to finish before responding." },
-  { id: "b3", title: "Correct Production of /s/ Sound", category: "Articulation", description: "Client produces /s/ phoneme correctly in initial, medial, and final word positions." },
-  { id: "b4", title: "Fluent Speech Without Repetitions", category: "Fluency", description: "Client speaks without part-word or whole-word repetitions exceeding typical disfluency norms." },
-  { id: "b5", title: "Appropriate Vocal Pitch Variation", category: "Voice", description: "Client demonstrates natural pitch inflection appropriate to age and gender norms." },
-  { id: "b6", title: "Use of Appropriate Sentence Length", category: "Language", description: "Client produces sentences of age-appropriate mean length of utterance (MLU)." },
-  { id: "b7", title: "Requesting Clarification", category: "Pragmatics", description: "Client appropriately requests clarification when a message is not understood." },
-  { id: "b8", title: "Appropriate Vocal Loudness", category: "Voice", description: "Client maintains vocal intensity appropriate to context without excessive strain." }
+  { id: "b1", title: "Eye Contact During Conversation", category: "Pragmatics", description: "Client initiates and maintains appropriate eye contact during conversational turns.", teaching_video_url: "https://www.youtube.com/watch?v=LXb3EKWsInQ" },
+  { id: "b2", title: "Turn-Taking in Dialogue", category: "Pragmatics", description: "Client waits for conversational partner to finish before responding.", teaching_video_url: "https://www.youtube.com/watch?v=LXb3EKWsInQ" },
+  { id: "b3", title: "Correct Production of /s/ Sound", category: "Articulation", description: "Client produces /s/ phoneme correctly in initial, medial, and final word positions.", teaching_video_url: "https://www.youtube.com/watch?v=jNQXAC9IVRw" },
+  { id: "b4", title: "Fluent Speech Without Repetitions", category: "Fluency", description: "Client speaks without part-word or whole-word repetitions exceeding typical disfluency norms.", teaching_video_url: "https://www.youtube.com/watch?v=aqz-KE-bpKQ" },
+  { id: "b5", title: "Appropriate Vocal Pitch Variation", category: "Voice", description: "Client demonstrates natural pitch inflection appropriate to age and gender norms.", teaching_video_url: "https://www.youtube.com/watch?v=jNQXAC9IVRw" },
+  { id: "b6", title: "Use of Appropriate Sentence Length", category: "Language", description: "Client produces sentences of age-appropriate mean length of utterance (MLU).", teaching_video_url: "https://www.youtube.com/watch?v=jNQXAC9IVRw" },
+  { id: "b7", title: "Requesting Clarification", category: "Pragmatics", description: "Client appropriately requests clarification when a message is not understood.", teaching_video_url: "https://www.youtube.com/watch?v=LXb3EKWsInQ" },
+  { id: "b8", title: "Appropriate Vocal Loudness", category: "Voice", description: "Client maintains vocal intensity appropriate to context without excessive strain.", teaching_video_url: "https://www.youtube.com/watch?v=jNQXAC9IVRw" }
 ];
 
 export default function AssessmentDashboard({ sessionId, patient, clinicianName }) {
@@ -562,6 +562,14 @@ ${absentRows}
                   <span className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${categoryStyle}`}>
                     {behavior.category}
                   </span>
+                  {behavior.teaching_video_url && (
+                    <button
+                      onClick={() => setActiveVideoBehavior(behavior)}
+                      className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/20 transition flex items-center gap-1"
+                    >
+                      <span>▶ Demo Video</span>
+                    </button>
+                  )}
                 </div>
 
                 <h3 className="font-bold text-white text-base leading-snug">{behavior.title}</h3>
@@ -717,6 +725,13 @@ ${absentRows}
           />
         )}
       </div>
+
+      {activeVideoBehavior && (
+        <TeachingVideoModal
+          behavior={activeVideoBehavior}
+          onClose={() => setActiveVideoBehavior(null)}
+        />
+      )}
     </div>
   );
 }

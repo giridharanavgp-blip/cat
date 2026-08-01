@@ -1,5 +1,24 @@
 import React, { useEffect, useRef } from "react";
 
+function getYouTubeEmbedUrl(url) {
+  if (!url) return null;
+  let videoId = null;
+  if (url.includes("youtube.com/embed/")) {
+    videoId = url.split("youtube.com/embed/")[1]?.split("?")[0]?.split("&")[0];
+  } else if (url.includes("youtu.be/")) {
+    videoId = url.split("youtu.be/")[1]?.split("?")[0]?.split("&")[0];
+  } else if (url.includes("youtube.com/watch")) {
+    try {
+      const searchParams = new URLSearchParams(url.split("?")[1]);
+      videoId = searchParams.get("v");
+    } catch (_) {}
+  }
+  if (videoId) {
+    return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
+  }
+  return null;
+}
+
 export default function TeachingVideoModal({ behavior, onClose }) {
   const videoRef = useRef(null);
 
@@ -13,13 +32,15 @@ export default function TeachingVideoModal({ behavior, onClose }) {
 
   if (!behavior) return null;
 
+  const youtubeEmbedUrl = getYouTubeEmbedUrl(behavior.teaching_video_url);
+
   return (
     <div
       className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
       <div
-        className="glass-panel rounded-2xl max-w-2xl w-full overflow-hidden border border-slate-700/60 shadow-2xl animate-fade-in"
+        className="glass-panel rounded-2xl max-w-3xl w-full overflow-hidden border border-slate-700/60 shadow-2xl animate-fade-in"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/60">
@@ -38,8 +59,16 @@ export default function TeachingVideoModal({ behavior, onClose }) {
           </button>
         </div>
 
-        <div className="bg-black/90 relative">
-          {behavior.teaching_video_url ? (
+        <div className="bg-black relative aspect-video flex items-center justify-center">
+          {youtubeEmbedUrl ? (
+            <iframe
+              className="w-full h-full border-0 rounded-none"
+              src={youtubeEmbedUrl}
+              title={behavior.title || "Speech Training Video"}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
+          ) : behavior.teaching_video_url ? (
             <video
               ref={videoRef}
               src={behavior.teaching_video_url}
@@ -57,9 +86,22 @@ export default function TeachingVideoModal({ behavior, onClose }) {
         </div>
 
         <div className="p-6 space-y-4 bg-slate-900/60">
-          <div className="flex items-center gap-2">
-            <span className="text-base">💡</span>
-            <h4 className="text-sm font-bold text-white uppercase tracking-wide">Caregiver & Clinician Guidance</h4>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-base">💡</span>
+              <h4 className="text-sm font-bold text-white uppercase tracking-wide">Caregiver & Clinician Guidance</h4>
+            </div>
+            {behavior.teaching_video_url && (
+              <a
+                href={behavior.teaching_video_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1 bg-indigo-500/10 px-3 py-1 rounded-lg border border-indigo-500/20 transition hover:bg-indigo-500/20"
+              >
+                <span>Watch directly on YouTube</span>
+                <span>↗</span>
+              </a>
+            )}
           </div>
           <p className="text-xs text-slate-300 leading-relaxed">
             {behavior.description ||

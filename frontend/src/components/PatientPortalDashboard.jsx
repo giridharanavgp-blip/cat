@@ -12,7 +12,7 @@ export default function PatientPortalDashboard({ patientName = "Maya Patel", age
       description: "Practice producing the /s/ sound cleanly at the beginning and end of words (e.g., 'sun', 'bus').",
       progress: 75,
       status: "In Progress",
-      teaching_video_url: "https://res.cloudinary.com/demo/video/upload/v1/cat/s_sound_demo.mp4",
+      teaching_video_url: "https://www.youtube.com/watch?v=jNQXAC9IVRw",
       notes: "Great improvement on initial position. Work on final /s/ sounds this week!"
     },
     {
@@ -22,7 +22,7 @@ export default function PatientPortalDashboard({ patientName = "Maya Patel", age
       description: "Maintain natural eye contact during conversational turns with family members.",
       progress: 90,
       status: "Achieved Target",
-      teaching_video_url: "https://res.cloudinary.com/demo/video/upload/v1/cat/eye_contact_demo.mp4",
+      teaching_video_url: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
       notes: "Maintained steady eye contact for 5 minutes during story time."
     },
     {
@@ -32,7 +32,7 @@ export default function PatientPortalDashboard({ patientName = "Maya Patel", age
       description: "Speak smoothly without repeating words or stopping mid-sentence.",
       progress: 60,
       status: "In Progress",
-      teaching_video_url: "https://res.cloudinary.com/demo/video/upload/v1/cat/fluency_demo.mp4",
+      teaching_video_url: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
       notes: "Practice gentle speech onset when starting new sentences."
     }
   ];
