@@ -1,18 +1,16 @@
 import { createClient } from "@supabase/supabase-js";
 
-const rawUrl = import.meta.env.VITE_SUPABASE_URL;
-const rawKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const DEFAULT_URL = "https://llswaoszvxxypmbcflbp.supabase.co";
+const DEFAULT_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxsc3dhb3N6dnh4eXBtYmNmbGJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0MjYzNDEsImV4cCI6MjEwMTAwMjM0MX0.P1yDbdLJW1m8r0BjH9B1BMtS9AIEmSvch1Eb0hMh25c";
 
-const isConfigured = rawUrl && rawUrl !== "https://your-project.supabase.co" && rawKey && rawKey !== "your_supabase_anon_key_here";
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_URL !== "https://your-project.supabase.co"
+  ? import.meta.env.VITE_SUPABASE_URL
+  : DEFAULT_URL;
 
-if (!isConfigured) {
-  console.warn(
-    "Supabase env vars are missing or placeholder. Update VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in frontend/.env with your Supabase credentials."
-  );
-}
-
-const supabaseUrl = isConfigured ? rawUrl : "https://placeholder.supabase.co";
-const supabaseAnonKey = isConfigured ? rawKey : "placeholder-key";
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY && import.meta.env.VITE_SUPABASE_ANON_KEY !== "your_supabase_anon_key_here"
+  ? import.meta.env.VITE_SUPABASE_ANON_KEY
+  : DEFAULT_ANON_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
 
