@@ -4,6 +4,7 @@ import { socket, AI_ENGINE_URL } from "../lib/socket";
 import { supabase } from "../lib/supabaseClient";
 import TeachingVideoModal from "./TeachingVideoModal";
 import ReportViewer from "./ReportViewer";
+import { BehaviorDonutChart, DomainBarChart, AudioAcousticGraph } from "./ClinicalCharts";
 
 const STATUS_OPTIONS = ["Present", "Absent", "Not Observed"];
 
@@ -519,6 +520,12 @@ ${absentRows}
         </div>
       </div>
 
+      {/* Interactive Clinical Evaluation Charts & Graphs */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <BehaviorDonutChart scores={scores} totalBehaviors={uniqueBehaviors.length} />
+        <DomainBarChart behaviors={uniqueBehaviors} scores={scores} />
+      </div>
+
       {errorMessage && (
         <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-sm flex items-center justify-between">
           <span>{errorMessage}</span>
@@ -671,6 +678,8 @@ ${absentRows}
 
         {audioAnalysis && (
           <div className="space-y-4 pt-2">
+            <AudioAcousticGraph audioAnalysis={audioAnalysis} />
+
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <AudioMetricCard label="Recording Duration" value={`${audioAnalysis.duration}s`} icon="⏱️" />
               <AudioMetricCard label="Speech Tempo" value={`${audioAnalysis.tempo_bpm} BPM`} icon="🎵" />

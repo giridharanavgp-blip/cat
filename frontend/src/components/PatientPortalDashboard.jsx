@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import TeachingVideoModal from "./TeachingVideoModal";
+import { WeeklyPracticeBarChart } from "./ClinicalCharts";
 
 export default function PatientPortalDashboard({ patientName = "Maya Patel", age = 10, diagnosis = "Articulation Deficit / Sigmatism", onSignOut }) {
   const [activeVideo, setActiveVideo] = useState(null);
@@ -131,6 +132,9 @@ export default function PatientPortalDashboard({ patientName = "Maya Patel", age
             ))}
           </div>
         </div>
+
+        {/* Weekly Activity Interactive Bar Chart */}
+        <WeeklyPracticeBarChart />
 
         {/* Clinical History & Practice Guidance */}
         <div className="glass-panel rounded-2xl p-6 space-y-4">
