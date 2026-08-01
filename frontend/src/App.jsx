@@ -164,6 +164,15 @@ export default function App() {
 
 
 
+  function handlePatientAccountLogin() {
+    setAuthError(null);
+    setUserRole("patient");
+    setSession({
+      user: { id: "patient-maya-123", email: "patient.maya@gmail.com" },
+      isDemo: false,
+    });
+  }
+
   function handleDemoClinicianLogin() {
     setAuthError(null);
     setUserRole("clinician");
@@ -423,7 +432,15 @@ export default function App() {
                   onClick={handleCustomAccountLogin}
                   className="w-full bg-gradient-to-r from-emerald-600 via-sky-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-semibold rounded-lg py-2.5 text-xs transition shadow-lg shadow-indigo-900/40 flex items-center justify-center gap-2 border border-emerald-400/30"
                 >
-                  <span>✨ Sign In as giridharan.avgp@gmail.com (Pass: giri1234)</span>
+                  <span>✨ Clinician Login: giridharan.avgp@gmail.com (Pass: giri1234)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handlePatientAccountLogin}
+                  className="w-full bg-gradient-to-r from-teal-600 via-emerald-600 to-cyan-600 hover:from-teal-500 hover:to-cyan-500 text-white font-semibold rounded-lg py-2.5 text-xs transition shadow-lg shadow-emerald-900/40 flex items-center justify-center gap-2 border border-teal-400/30"
+                >
+                  <span>👤 Patient Login: patient.maya@gmail.com (Pass: patient1234)</span>
                 </button>
 
                 <button
@@ -434,15 +451,6 @@ export default function App() {
                   <span>⚡ Clinician Demo (Dr. Demo, SLP)</span>
                 </button>
 
-
-                <button
-                  type="button"
-                  onClick={handleDemoPatientLogin}
-                  className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold rounded-lg py-2 text-xs transition shadow-md shadow-emerald-900/30 flex items-center justify-center gap-2 border border-emerald-400/20"
-                >
-                  <span>👤 Patient Demo (Maya Patel, Age 10)</span>
-                </button>
-
                 <button
                   type="button"
                   onClick={handleDemoAdminLogin}
@@ -451,6 +459,7 @@ export default function App() {
                   <span>👑 Clinic Director & Admin Demo</span>
                 </button>
               </div>
+
 
               <div className="mt-4 text-center">
                 <button
