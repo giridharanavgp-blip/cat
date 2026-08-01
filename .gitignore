@@ -28,3 +28,4 @@ frontend/build/
 Thumbs.db
 
 .vercel
+.env*
