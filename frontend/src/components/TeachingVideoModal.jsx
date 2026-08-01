@@ -24,8 +24,8 @@ const SAMPLE_SPEECH_VIDEO_URL = "https://www.w3schools.com/html/mov_bbb.mp4";
 
 export default function TeachingVideoModal({ behavior, onClose }) {
   const videoRef = useRef(null);
-  const [playerMode, setPlayerMode] = useState("html5"); // "html5" or "youtube"
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [playerMode, setPlayerMode] = useState("youtube"); // Default to YouTube Video Player
+  const [isPlaying, setIsPlaying] = useState(true);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [showWaveform, setShowWaveform] = useState(true);
 
