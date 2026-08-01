@@ -19,8 +19,8 @@ function getYouTubeEmbedUrl(url) {
   return null;
 }
 
-// Fallback high-speed direct HTML5 demonstration video URL for speech practice
-const SAMPLE_SPEECH_VIDEO_URL = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4";
+// Guaranteed HTML5 video source for speech practice demonstration
+const SAMPLE_SPEECH_VIDEO_URL = "https://www.w3schools.com/html/mov_bbb.mp4";
 
 export default function TeachingVideoModal({ behavior, onClose }) {
   const videoRef = useRef(null);

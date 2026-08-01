@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import TeachingVideoModal from "./TeachingVideoModal";
-import { WeeklyPracticeBarChart } from "./ClinicalCharts";
+import { BehaviorDonutChart, DomainBarChart, AudioAcousticGraph, WeeklyPracticeBarChart } from "./ClinicalCharts";
 
 export default function PatientPortalDashboard({ patientName = "Maya Patel", age = 10, diagnosis = "Articulation Deficit / Sigmatism", onSignOut }) {
   const [activeVideo, setActiveVideo] = useState(null);
@@ -133,8 +133,18 @@ export default function PatientPortalDashboard({ patientName = "Maya Patel", age
           </div>
         </div>
 
-        {/* Weekly Activity Interactive Bar Chart */}
-        <WeeklyPracticeBarChart />
+        {/* Clinical Charts & Graphs Section */}
+        <div className="space-y-4 pt-2">
+          <h2 className="text-lg font-bold text-white tracking-tight">Speech Therapy Progress Graphs & Analytics</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <BehaviorDonutChart scores={{ b1: { status: "Present" }, b3: { status: "Present" }, b4: { status: "Absent" } }} totalBehaviors={8} />
+            <DomainBarChart behaviors={[{ category: "Articulation" }, { category: "Pragmatics" }, { category: "Fluency" }, { category: "Voice" }, { category: "Language" }]} scores={{}} />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <AudioAcousticGraph audioAnalysis={{ pitch_avg: 192, words_per_minute: 140, loudness_db: -16, duration: 8.5 }} />
+            <WeeklyPracticeBarChart />
+          </div>
+        </div>
 
         {/* Clinical History & Practice Guidance */}
         <div className="glass-panel rounded-2xl p-6 space-y-4">
