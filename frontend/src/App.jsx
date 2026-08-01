@@ -51,7 +51,39 @@ export default function App() {
   const [newPatientDiagnosis, setNewPatientDiagnosis] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
 
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [newUpdateEmail, setNewUpdateEmail] = useState("");
+  const [newUpdatePassword, setNewUpdatePassword] = useState("");
+  const [isUpdatingCredentials, setIsUpdatingCredentials] = useState(false);
+
   const [activeSessionId, setActiveSessionId] = useState(null);
+
+  async function handleUpdateCredentials(e) {
+    e.preventDefault();
+    if (!newUpdateEmail && !newUpdatePassword) return;
+    setIsUpdatingCredentials(true);
+    try {
+      const updateData = {};
+      if (newUpdateEmail) updateData.email = newUpdateEmail;
+      if (newUpdatePassword) updateData.password = newUpdatePassword;
+
+      const { data, error } = await supabase.auth.updateUser(updateData);
+      if (error) throw error;
+
+      if (data?.user) {
+        setSession((prev) => prev ? { ...prev, user: data.user } : prev);
+      }
+      alert("Credentials updated successfully in Supabase!");
+      setShowSettingsModal(false);
+      setNewUpdateEmail("");
+      setNewUpdatePassword("");
+    } catch (err) {
+      alert("Failed to update credentials: " + err.message);
+    } finally {
+      setIsUpdatingCredentials(false);
+    }
+  }
+
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -502,6 +534,13 @@ export default function App() {
             </div>
 
             <button
+              onClick={() => setShowSettingsModal(true)}
+              className="text-xs font-semibold px-3.5 py-2 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 transition flex items-center gap-1.5"
+            >
+              <span>⚙️ Account & Credentials Settings</span>
+            </button>
+
+            <button
               onClick={handleSignOut}
               className="text-xs font-medium px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition"
             >
@@ -510,6 +549,79 @@ export default function App() {
           </div>
         </div>
       </header>
+
+      {/* Account Settings Modal */}
+      {showSettingsModal && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="glass-panel w-full max-w-md rounded-2xl p-6 shadow-2xl relative gradient-border space-y-5">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+              <div>
+                <h3 className="text-lg font-bold text-white">Account & Password Settings</h3>
+                <p className="text-xs text-slate-400">Update your Supabase login ID and password</p>
+              </div>
+              <button
+                onClick={() => setShowSettingsModal(false)}
+                className="text-slate-400 hover:text-white text-lg font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateCredentials} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">Current Login ID / Email</label>
+                <input
+                  type="text"
+                  disabled
+                  value={session.user.email || "dr.demo.slp@example.com"}
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3.5 py-2 text-xs text-slate-400"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">New Gmail / Login Email</label>
+                <input
+                  type="email"
+                  placeholder="yourname@gmail.com"
+                  value={newUpdateEmail}
+                  onChange={(e) => setNewUpdateEmail(e.target.value)}
+                  className="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">New Password</label>
+                <input
+                  type="password"
+                  placeholder="Enter new password (min 6 chars)"
+                  value={newUpdatePassword}
+                  onChange={(e) => setNewUpdatePassword(e.target.value)}
+                  minLength={6}
+                  className="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-3 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setShowSettingsModal(false)}
+                  className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isUpdatingCredentials}
+                  className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30"
+                >
+                  {isUpdatingCredentials ? "Updating..." : "Save Credentials to Supabase"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
 
       {/* Main Workspace Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-8 space-y-8">
