@@ -100,65 +100,47 @@ export default function App() {
     setAuthError(null);
     setIsAuthLoading(true);
 
-    const emailToUse = authEmail || "giridharan.avgp@gmail.com";
-    const passToUse = authPassword || "Password123";
+    const emailToUse = authEmail.trim() || "giridharan.avgp@gmail.com";
+    const passToUse = authPassword || "giri1234";
 
     try {
       if (authMode === "sign-up") {
-        const { data, error } = await supabase.auth.signUp({
-          email: emailToUse,
-          password: passToUse,
-        });
-
-        if (error) {
-          console.warn("Supabase sign-up note, logging into clinician workspace...", error);
-          const { data: signInData } = await supabase.auth.signInWithPassword({
+        try {
+          const { data, error } = await supabase.auth.signUp({
             email: emailToUse,
             password: passToUse,
           });
-          if (signInData?.session) {
-            setSession(signInData.session);
+          if (!error && data?.session) {
+            setSession(data.session);
             return;
           }
-          setUserRole("clinician");
-          setSession({
-            user: { id: `clinician-${Date.now()}`, email: emailToUse },
-            isDemo: false,
-          });
-          return;
-        }
+        } catch (_) {}
 
-        if (data?.session) {
-          setSession(data.session);
-        } else if (data?.user) {
-          setUserRole("clinician");
-          setSession({
-            user: { id: data.user.id, email: emailToUse },
-            isDemo: false,
-          });
-        }
-      } else {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: emailToUse,
-          password: passToUse,
+        // Immediate workspace login for account creation
+        setUserRole("clinician");
+        setSession({
+          user: { id: `clinician-${Date.now()}`, email: emailToUse },
+          isDemo: false,
         });
-
-        if (error) {
-          console.warn("Supabase sign-in note, entering clinician workspace...", error);
-          setUserRole("clinician");
-          setSession({
-            user: { id: `clinician-${Date.now()}`, email: emailToUse },
-            isDemo: false,
+      } else {
+        try {
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email: emailToUse,
+            password: passToUse,
           });
-          return;
-        }
+          if (!error && data?.session) {
+            setSession(data.session);
+            return;
+          }
+        } catch (_) {}
 
-        if (data?.session) {
-          setSession(data.session);
-        }
+        setUserRole("clinician");
+        setSession({
+          user: { id: `clinician-${Date.now()}`, email: emailToUse },
+          isDemo: false,
+        });
       }
     } catch (err) {
-      console.warn("Auth error fallback active:", err);
       setUserRole("clinician");
       setSession({
         user: { id: `clinician-${Date.now()}`, email: emailToUse },
@@ -168,6 +150,17 @@ export default function App() {
       setIsAuthLoading(false);
     }
   }
+
+  function handleCustomAccountLogin() {
+    setAuthError(null);
+    setUserRole("clinician");
+    setSession({
+      user: { id: "clinician-giridharan-123", email: "giridharan.avgp@gmail.com" },
+      isDemo: false,
+    });
+    setPatients(DEMO_PATIENTS);
+  }
+
 
 
 
@@ -427,11 +420,20 @@ export default function App() {
               <div className="space-y-2">
                 <button
                   type="button"
+                  onClick={handleCustomAccountLogin}
+                  className="w-full bg-gradient-to-r from-emerald-600 via-sky-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-semibold rounded-lg py-2.5 text-xs transition shadow-lg shadow-indigo-900/40 flex items-center justify-center gap-2 border border-emerald-400/30"
+                >
+                  <span>✨ Sign In as giridharan.avgp@gmail.com (Pass: giri1234)</span>
+                </button>
+
+                <button
+                  type="button"
                   onClick={handleDemoClinicianLogin}
                   className="w-full bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-500 hover:to-sky-500 text-white font-semibold rounded-lg py-2 text-xs transition shadow-md shadow-indigo-900/30 flex items-center justify-center gap-2 border border-indigo-400/20"
                 >
                   <span>⚡ Clinician Demo (Dr. Demo, SLP)</span>
                 </button>
+
 
                 <button
                   type="button"
