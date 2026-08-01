@@ -7,6 +7,7 @@ import ReportViewer from "./ReportViewer";
 import { BehaviorDonutChart, DomainBarChart, AudioAcousticGraph } from "./ClinicalCharts";
 import LiveCameraEyeTracker from "./LiveCameraEyeTracker";
 import SpeechTrainingBot from "./SpeechTrainingBot";
+import AudioToTextConverter from "./AudioToTextConverter";
 
 const STATUS_OPTIONS = ["Present", "Absent", "Not Observed"];
 
@@ -697,6 +698,15 @@ ${absentRows}
                 "{audioAnalysis.transcript}"
               </p>
             </div>
+
+            {/* Live Audio to Text Converter */}
+            <AudioToTextConverter initialTranscript={audioAnalysis.transcript} />
+          </div>
+        )}
+
+        {!audioAnalysis && (
+          <div className="pt-2">
+            <AudioToTextConverter />
           </div>
         )}
       </div>
